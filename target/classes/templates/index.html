@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RailConnect | Online Railway Ticket Booking</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+:root{
+  --rail-red:#b91c1c;
+  --dark:#0f172a;
+  --glass:rgba(255,255,255,.18);
+}
+
+*{box-sizing:border-box;font-family:Poppins}
+body{margin:0;background:#f4f6f8;color:#222}
+
+/* NAVBAR */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--rail-red);
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  padding:14px 40px;
+}
+nav a{
+  color:#fff;text-decoration:none;
+  margin-left:20px;font-weight:500;
+  cursor:pointer;position:relative;
+}
+nav a.active::after{
+  content:"";position:absolute;
+  left:0;bottom:-6px;
+  width:100%;height:3px;
+  background:#fff;border-radius:10px;
+}
+
+/* PAGE SYSTEM */
+.page{display:none;animation:fade .5s ease}
+.page.active{display:block}
+@keyframes fade{
+  from{opacity:0;transform:translateY(15px)}
+  to{opacity:1;transform:none}
+}
+
+/* HOME – FULL TRAIN BACKGROUND */
+.home{
+  height:100vh;
+  width:100%;
+  background:
+    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+    url("https://images.unsplash.com/photo-1601999007938-f584b47324ac?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:cover;
+
+  color:#fff;
+  padding:90px;
+  position:relative;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.home h1{font-size:54px;font-weight:600}
+.home p{max-width:680px;font-size:18px;line-height:1.6}
+.home button{
+  padding:15px 42px;
+  margin-top:30px;
+  background:linear-gradient(135deg,#dc2626,#7f1d1d);
+  color:#fff;border:none;
+  border-radius:40px;
+  font-size:17px;
+  cursor:pointer;
+  box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+
+/* ANIMATED TRAIN */
+.train{
+  position:absolute;
+  bottom:30px;
+  right:-350px;
+  font-size:72px;
+  animation:moveTrain 10s linear infinite;
+}
+@keyframes moveTrain{
+  to{right:110%}
+}
+
+/* BOOKING PAGE */
+.booking-layout{
+  min-height:100vh;
+  display:flex;
+  background:
+    linear-gradient(rgba(15,23,42,.75),rgba(15,23,42,.75)),
+    url("https://plus.unsplash.com/premium_photo-1665772800957-724af6f7545b?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+    center/cover no-repeat;
+}
+
+/* LEFT SLIDESHOW */
+.booking-left{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+.booking-left img{
+  position:absolute;
+  width:100%;height:100%;
+  object-fit:cover;
+  opacity:0;
+  animation:slide 12s infinite;
+}
+.booking-left img:nth-child(2){animation-delay:4s}
+.booking-left img:nth-child(3){animation-delay:8s}
+@keyframes slide{
+  0%{opacity:0}
+  10%{opacity:1}
+  30%{opacity:1}
+  40%{opacity:0}
+  100%{opacity:0}
+}
+.booking-caption{
+  position:absolute;
+  bottom:20px;left:20px;
+  color:#fff;font-size:22px;
+}
+
+/* RIGHT GLASS FORM */
+.booking-right{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px;
+}
+.booking-form{
+  width:100%;
+  max-width:520px;
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  border-radius:26px;
+  padding:40px;
+  box-shadow:0 30px 60px rgba(0,0,0,.45);
+  color:#fff;
+}
+.booking-form h2{text-align:center;margin-bottom:15px}
+
+input,select{
+  width:100%;
+  padding:13px;
+  margin-top:12px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+}
+input:focus,select:focus{
+  box-shadow:0 0 0 3px rgba(220,38,38,.35);
+}
+.submit{
+  margin-top:22px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:40px;
+  font-size:16px;
+  background:linear-gradient(135deg,#dc2626,#7f1d1d);
+  color:#fff;
+  cursor:pointer;
+}
+
+/* CARD */
+.card{
+  max-width:1000px;
+  margin:40px auto;
+  background:#fff;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.15);
+}
+.card::before{
+  content:"";
+  display:block;
+  height:4px;
+  background:linear-gradient(90deg,#dc2626,#f97316);
+  border-radius:20px 20px 0 0;
+}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #ddd}
+
+/* FOOTER */
+footer{
+  background:#111;
+  color:#ccc;
+  text-align:center;
+  padding:15px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div>🚆 RailConnect</div>
+  <div>
+    <a data-page="home" class="active">Home</a>
+    <a data-page="booking">Booking</a>
+    <a data-page="pnr">Check PNR</a>
+    <a data-page="all">All Bookings</a>
+    <a data-page="contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="page active">
+  <div class="home">
+    <h1>Online Railway Ticket Booking System</h1>
+    <p>
+      Book train tickets seamlessly with instant PNR generation,
+      automatic PDF ticket download, and real-time PNR status checking.
+    </p>
+    <button data-page="booking">Book Ticket</button>
+    <div class="train">🚂</div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="page">
+  <div class="booking-layout">
+    <div class="booking-left">
+      <img src="https://images.unsplash.com/photo-1474487548417-781cb71495f3">
+      <img src="https://images.unsplash.com/photo-1601999007938-f584b47324ac">
+      <img src="https://images.unsplash.com/photo-1589196728426-4613a4992c42">
+      <div class="booking-caption">Safe • Fast • Reliable Rail Travel</div>
+    </div>
+    <div class="booking-right">
+     <form class="booking-form"
+      th:action="@{/book-ticket}"
+      th:object="${ticket}"
+      method="post">
+        <h2>Train Ticket Booking</h2>
+        <input id="from"  th:field="*{fromStation}" placeholder="From Station" required>
+        <input id="to"  th:field="*{toStation}" placeholder="To Station" required>
+        <input id="date"  th:field="*{date}" type="date" required>
+        <select th:field="*{cls}">
+  <option value="General">General</option>
+  <option value="SL">SL</option>
+  <option value="3A">3A</option>
+  <option value="2A">2A</option>
+  <option value="1A">1A</option>
+</select>
+        <input id="passengerName" th:field="*{passengerName}" placeholder="Passenger Name" required>
+        <select th:field="*{gender}">
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+</select>
+        <input id="mobile"th:field="*{mobile}" placeholder="Mobile Number" required>
+        <input id="email" th:field="*{email}" placeholder="Email">
+        <button class="submit">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CHECK PNR -->
+<section id="pnr" class="page">
+  <div class="card">
+    <h2>Check PNR Status</h2>
+    <input id="pnrInput" placeholder="Enter PNR">
+    <button class="submit" onclick="checkPNR()">Check</button>
+    <div id="pnrResult"></div>
+  </div>
+</section>
+
+<!-- ALL BOOKINGS -->
+<section id="all" class="page">
+  <div class="card">
+    <h2>All Bookings</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>PNR</th>
+          <th>Passenger</th>
+          <th>Route</th>
+          <th>Date</th>
+          <th>Class</th>
+        </tr>
+      </thead>
+      <tbody id="bookingTable"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="page">
+  <div class="card">
+    <h2>Contact Us</h2>
+    <p><b>Project:</b> Online Railway Ticket Booking System</p>
+    <p><b>Email:</b> railconnect@demo.com</p>
+    <p><b>Phone:</b> +91 9876543210</p>
+    <p><b>Location:</b> India</p>
+  </div>
+</section>
+
+<footer>© 2026 RailConnect | Railway Booking System</footer>
+
+<script>
+/* ROUTER */
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav a").forEach(a=>a.classList.remove("active"));
+  document.querySelector(`[data-page="${id}"]`).classList.add("active");
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-page]").forEach(el=>{
+  el.onclick=()=>showPage(el.dataset.page);
+});
+
+/* DATA */
+
+
+/* PNR */
+
+
+/* BOOKING */
+
+
+/* PDF */
+
+
+
+/* LOAD TABLE */
+
+/* CHECK PNR */
+
+function checkPNR() {
+  const pnr = document.getElementById("pnrInput").value.trim();
+  const resultDiv = document.getElementById("pnrResult");
+
+  if (!pnr) {
+    resultDiv.innerHTML = "<p style='color:red'>Enter PNR</p>";
+    return;
+  }
+
+  fetch(`/api/check-pnr?pnr=${pnr}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Not found");
+      return res.json();
+    })
+    .then(data => {
+      resultDiv.innerHTML = `
+        <p>
+		  <b style="color:blue" >This is Booking Detail</b><br>
+          <b>Passenger: </b> ${data.passengerName}<br>
+          <b>Route: </b> ${data.fromStation} → ${data.toStation}<br>
+          <b>Date: </b> ${data.date}<br>
+          <b>Class: </b> ${data.cls}<br>
+          <b>Mobile: </b> ${data.mobile}<br>
+          <b>Email: </b> ${data.email} <br>
+          
+        </p>
+      `;
+    })
+    .catch(() => {
+      resultDiv.innerHTML =
+        "<p style='color:red'>Invalid PNR or Booking not found</p>";
+    });
+}
+
+
+</script>
+
+</body>
+</html>

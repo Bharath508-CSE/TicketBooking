@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: railconnect
+    ports:
+      - "3306:3306"
+
+  ticket-app:
+    build: .
+    container_name: ticket-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db
